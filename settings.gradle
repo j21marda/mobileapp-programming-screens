@@ -1,0 +1,2 @@
+rootProject.name='Screens'
+include ':app'
