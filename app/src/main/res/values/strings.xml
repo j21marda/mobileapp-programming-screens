@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Screens</string>
     <string name="button_main">Start</string>
+    <string name="extra_name">By student: </string>
+    <string name="extra_number">The number is: </string>
 </resources>
