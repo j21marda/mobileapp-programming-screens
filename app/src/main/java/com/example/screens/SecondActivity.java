@@ -1,6 +1,7 @@
 package com.example.screens;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,12 +12,16 @@ public class SecondActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
 
+        TextView textName = findViewById(R.id.textName);
+        TextView textNumb = findViewById(R.id.textNumb);
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String name = extras.getString("name");
             int number = extras.getInt("number");
-            // Do something with the name and number
+
+            textName.setText(getString(R.string.extra_name) + name);
+            textNumb.setText(getString(R.string.extra_number) + number);
         }
     }
 }
