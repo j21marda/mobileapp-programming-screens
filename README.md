@@ -1,42 +1,127 @@
 
 # Rapport
 
-**Skriv din rapport här!**
+Först skapades en ny aktivitet samt tillhörande layout-fil. Aktiviteten döptes till SecondActivity.java och xml-filen blev activity_second.xml
 
-_Du kan ta bort all text som finns sedan tidigare_.
-
-## Följande grundsyn gäller dugga-svar:
-
-- Ett kortfattat svar är att föredra. Svar som är längre än en sida text (skärmdumpar och programkod exkluderat) är onödigt långt.
-- Svaret skall ha minst en snutt programkod.
-- Svaret skall inkludera en kort övergripande förklarande text som redogör för vad respektive snutt programkod gör eller som svarar på annan teorifråga.
-- Svaret skall ha minst en skärmdump. Skärmdumpar skall illustrera exekvering av relevant programkod. Eventuell text i skärmdumpar måste vara läsbar.
-- I de fall detta efterfrågas, dela upp delar av ditt svar i för- och nackdelar. Dina för- respektive nackdelar skall vara i form av punktlistor med kortare stycken (3-4 meningar).
-
-Programkod ska se ut som exemplet nedan. Koden måste vara korrekt indenterad då den blir lättare att läsa vilket gör det lättare att hitta syntaktiska fel.
+Inuti den första layout-filen "activity_main.xml" skapades en knapp med id:t "knapp". Knappen innehåller en string av text som hittas inuti "strings.xml"
 
 ```
-function errorCallback(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            // Geolocation API stöds inte, gör något
-            break;
-        case error.POSITION_UNAVAILABLE:
-            // Misslyckat positionsanrop, gör något
-            break;
-        case error.UNKNOWN_ERROR:
-            // Okänt fel, gör något
-            break;
+ <Button
+        android:id="@+id/knapp"
+        android:text="@string/button_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+```
+```
+ <string name="button_main">Start</string>
+```
+För att knappen ska kunna starta den nya aktiviteten lades kod till i MainActivity.Java
+Knappen hittas genom id:t "knapp" och sedan används en OnClickListener med kod som specifierar vad som händer när knappen blir nedtryck.
+Med en intent startar aktiviteten genom att säga vilken aktivitet vi startar på (MainActivity) och vilken aktivitet som är desitinationen (SecondActivity). 
+```
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Button button = findViewById(R.id.knapp);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
-}
 ```
+Jag stötte på ett problem där appen kraschade när knappen trycktes ned. Detta löstes genom att ändra AndroidManifest.xml, där min SecondActivity inte lagts till ännu.
+När aktiviteten deklarerats funkade appen.
+```
+ <activity android:name=".SecondActivity"/>
+```
+Sedan lades kod till för att skicka data med extras från MainActivity. Värdet för name är j21marda (string) och värdet för number är 21 (int)
+```
+    public void onClick(View v) {
+        Intent intent = new Intent(MainActivity.this, SecondActivity.class);
+        intent.putExtra("name", "j21marda");
+        intent.putExtra("number", 21);
+        startActivity(intent);
+    }
+```
+För att datan ska kunna användas av SecondActivity lades kod till som hämtar min string och min int, *om* extras existerar.
+```
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_second);
 
-Bilder läggs i samma mapp som markdown-filen.
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String name = extras.getString("name");
+            int number = extras.getInt("number");
+        }
+    }
+```
+För att visa upp datan i SecondActivity skapades två textviews i activity_second.xml
+Ena viewen ska visa text, tillsammans med data från "name", den andra visar text, tillsammans med data från "number".
+Varje textview får ett id.
 
-![](android.png)
+```
+    <TextView
+        android:id="@+id/textName"
+        android:text="@string/extra_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/hello"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-Läs gärna:
+    <TextView
+        android:id="@+id/textNumb"
+        android:text="@string/extra_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/textName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+```
+Texten mina textviews visar skapas inuti strings.xml
 
-- Boulos, M.N.K., Warren, J., Gong, J. & Yue, P. (2010) Web GIS in practice VIII: HTML5 and the canvas element for interactive online mapping. International journal of health geographics 9, 14. Shin, Y. &
-- Wunsche, B.C. (2013) A smartphone-based golf simulation exercise game for supporting arthritis patients. 2013 28th International Conference of Image and Vision Computing New Zealand (IVCNZ), IEEE, pp. 459–464.
-- Wohlin, C., Runeson, P., Höst, M., Ohlsson, M.C., Regnell, B., Wesslén, A. (2012) Experimentation in Software Engineering, Berlin, Heidelberg: Springer Berlin Heidelberg.
+```
+    <string name="extra_name">By student: </string>
+    <string name="extra_number">The number is: </string>
+```
+För att SecondActivity ska visa text ur textviews samt extra-datan från intent, läggs ytterligare kod till i java-filen.
+Först hämtas referenser till mina textviews genom "findViewById".
+Inuti koden som körs om extras inte är noll, används "setText" för varje textview tillsammans med "getString" som hämtar dess strings. 
+Sedan läggs "+ name" och "+ number" till på respektive rad för att slå ihop dess data med textview-stringsen.
+
+```
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_second);
+
+        TextView textName = findViewById(R.id.textName);
+        TextView textNumb = findViewById(R.id.textNumb);
+
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String name = extras.getString("name");
+            int number = extras.getInt("number");
+
+            textName.setText(getString(R.string.extra_name) + name);
+            textNumb.setText(getString(R.string.extra_number) + number);
+        }
+    }
+```
+Resultat:
+MainActivity
+![img.png](img.png)
+SecondActivity
+![img_1.png](img_1.png)
+
